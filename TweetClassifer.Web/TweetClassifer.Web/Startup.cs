@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TweetClassifer.Web.Hubs;
+using TweetClassifer.Web.Services;
 
 namespace TweetClassifer.Web
 {
@@ -20,6 +21,8 @@ namespace TweetClassifer.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<TweetTableStorage>();
+
             services.AddMvc();
             services.AddSignalR();
         }

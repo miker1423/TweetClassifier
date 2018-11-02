@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace TweetClassifer.Shared.Models
+﻿namespace TweetClassifer.Shared.Models
 {
     public class TweetVM
     { 

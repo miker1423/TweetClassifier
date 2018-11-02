@@ -4,7 +4,11 @@ using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Threading;
 using Tweetinvi;
+using Tweetinvi.Models;
+using System.Collections.Generic;
+using TweetClassifer.Shared.Models;
 
 namespace TweetClassifer.Chooser
 {
@@ -17,6 +21,30 @@ namespace TweetClassifer.Chooser
                 BaseAddress = new Uri(args[0])
             };
 
+            var tweetQueue = new Queue<TweetVM>();
+
+            var thread = new Thread((state) =>
+            {
+                var tweetList = new List<TweetVM>();
+                while (true)
+                {
+                    if(tweetQueue.Count != 0)
+                    {
+                        tweetList.Add(tweetQueue.Dequeue());
+                    }
+
+                    if(tweetList.Count > 9)
+                    {
+                        var json = JsonConvert.SerializeObject(tweetList);
+                        var jsonContent = new StringContent(json, Encoding.UTF8, "application/json");
+                        httpClient.PostAsync("/api/tweets", jsonContent);
+
+                        tweetList.Clear();
+                    }
+                }
+
+            });
+
             Auth.SetUserCredentials(args[1], args[2], args[3], args[4]);
 
             var user = User.GetAuthenticatedUser();
@@ -24,8 +52,8 @@ namespace TweetClassifer.Chooser
             var regex = new Regex(@"\p{Cs}");
 
             var stream = Stream.CreateFilteredStream();
-            stream.AddTweetLanguageFilter(Tweetinvi.Models.LanguageFilter.English);
-            stream.AddTrack("the The");
+            stream.AddTweetLanguageFilter(LanguageFilter.English);
+            stream.AddTrack("the The be to of and a Be To Of And A");
 
             Console.CancelKeyPress += (sender, cnArgs) =>
             {
@@ -39,9 +67,7 @@ namespace TweetClassifer.Chooser
                 var tweet = twArgs.Tweet;
                 if (!tweet.IsRetweet && regex.IsMatch(tweet.Text))
                 {
-                    var json = JsonConvert.SerializeObject(tweet.ToVM());
-                    var jsonContent = new StringContent(json, Encoding.UTF8, "application/json");
-                    httpClient.PostAsync("/api/tweets", jsonContent);
+                    tweetQueue.Enqueue(tweet.ToVM());
                 }
             };
             await stream.StartStreamMatchingAnyConditionAsync();
