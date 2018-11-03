@@ -21,8 +21,15 @@ namespace TweetClassifer.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<TweetTableStorage>();
+            services.AddCors(options => options.AddPolicy("CorsPolicy",
+                builder =>
+                {
+                    builder.AllowAnyMethod().AllowAnyHeader()
+                        .WithOrigins("http://localhost:5000")
+                        .AllowCredentials();
+                }));
 
+            services.AddSingleton<TweetTableStorage>();
             services.AddMvc();
             services.AddSignalR();
         }
@@ -34,9 +41,13 @@ namespace TweetClassifer.Web
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseStaticFiles();
+
+            app.UseCors("CorsPolicy");
+
             app.UseSignalR((builder) =>
             {
-                builder.MapHub<MainHub>("/tweets");
+                builder.MapHub<MainHub>("/tweetsClass");
             });
 
             app.UseMvc();

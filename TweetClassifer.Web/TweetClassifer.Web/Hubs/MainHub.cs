@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,11 @@ namespace TweetClassifer.Web.Hubs
         public MainHub(TweetTableStorage storageService)
             => _storageService = storageService;
 
-
+        public async override Task OnConnectedAsync()
+        {
+            await base.OnConnectedAsync();
+            var tweets = await _storageService.GetUnClassified();
+            await Clients.Client(Context.ConnectionId).SendAsync("Tweets", JsonConvert.SerializeObject(tweets));
+        }
     }
 }
