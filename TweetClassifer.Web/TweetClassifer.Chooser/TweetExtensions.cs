@@ -12,7 +12,7 @@ namespace TweetClassifer.Chooser
             => new TweetVM
             {
                 Text = tweet.Text,
-                URL = tweet.CreatedBy.Url,
+                URL = "https://twitter.com/" + tweet.CreatedBy.ScreenName,
                 Gender = Gender.Other
             };
     }

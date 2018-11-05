@@ -18,7 +18,7 @@ namespace TweetClassifer.Web.Hubs
         {
             await base.OnConnectedAsync();
             var tweets = await _storageService.GetUnClassified();
-            var filtered = tweets.Skip(random.Next(0, tweets.Count / 2));
+            var filtered = tweets.Skip(random.Next(0, tweets.Count / 2)).Take(10);
             await Clients.Client(Context.ConnectionId).SendAsync("Tweets", JsonConvert.SerializeObject(filtered));
         }
     }

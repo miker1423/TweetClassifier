@@ -31,10 +31,12 @@ namespace TweetClassifer.Chooser
                     if(tweetQueue.Count != 0)
                     {
                         tweetList.Add(tweetQueue.Dequeue());
+                        Console.Write($"{tweetList.Count} ");
                     }
 
                     if(tweetList.Count > 9)
                     {
+                        Console.WriteLine("Send");
                         var json = JsonConvert.SerializeObject(tweetList);
                         var jsonContent = new StringContent(json, Encoding.UTF8, "application/json");
                         httpClient.PostAsync("/api/tweets", jsonContent);
@@ -44,6 +46,7 @@ namespace TweetClassifer.Chooser
                 }
 
             });
+            thread.Start();
 
             Auth.SetUserCredentials(args[1], args[2], args[3], args[4]);
 
@@ -65,7 +68,7 @@ namespace TweetClassifer.Chooser
             stream.MatchingTweetReceived += (sender, twArgs) =>
             {
                 var tweet = twArgs.Tweet;
-                if (!tweet.IsRetweet && regex.IsMatch(tweet.Text))
+                if (!tweet.IsRetweet && !regex.IsMatch(tweet.Text))
                 {
                     tweetQueue.Enqueue(tweet.ToVM());
                 }
