@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
 
 using TweetClassifer.Web.Models;
@@ -34,5 +35,8 @@ namespace TweetClassifer.Web.Services
             file.Seek(0, SeekOrigin.Begin);
             return file as FileStream;
         }
+
+        public static IEnumerable<dynamic> GetClassifierReady(List<TweetEntry> entries)
+            => entries.Select(entry => new { entry.Tweet.Text, entry.Tweet.Gender });
     }
 }

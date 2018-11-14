@@ -68,5 +68,9 @@ namespace TweetClassifer.Web.Controllers
             var file = await CsvGenerator.GetCSV(classified);
             return File(file, "application/octet-stream", "tweets.csv");
         }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> Json()
+            => Json(CsvGenerator.GetClassifierReady(await _storageService.GetClassified()));
     }
 }
