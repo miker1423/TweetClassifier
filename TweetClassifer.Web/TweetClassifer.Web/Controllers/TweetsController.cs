@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+
 using TweetClassifer.Shared.Models;
 using TweetClassifer.Web.Services;
 
@@ -33,11 +32,41 @@ namespace TweetClassifer.Web.Controllers
             return Ok();
         }
 
+        [HttpGet("[action]")]
+        public async Task<IActionResult> Classified()
+        {
+            var classified = await _storageService.GetClassified();
+            return Json(new { classified = classified.Count });
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> Unclassified()
+        {
+            var uncassified = await _storageService.GetUnClassified();
+            return Json(new { Unclassified = uncassified.Count });
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> Total() 
+            => Json(new { Total = await _storageService.TotalCount() });
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> Stats()
+            => Json(await _storageService.GetStats());
+
         [HttpDelete]
         public async Task<IActionResult> Delete([FromQuery]string id)
         {
             await _storageService.Remove(id);
             return Ok();
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> Csv()
+        {
+            var classified = await _storageService.GetClassified();
+            var file = await CsvGenerator.GetCSV(classified);
+            return File(file, "application/octet-stream", "tweets.csv");
         }
     }
 }

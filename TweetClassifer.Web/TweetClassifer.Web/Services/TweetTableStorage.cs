@@ -61,6 +61,15 @@ namespace TweetClassifer.Web.Services
             return result.ToList();
         }
 
+        public async Task<(int males, int female, int other)> GetStats()
+        {
+            var cursor = (await collection.FindAsync((entry) => entry.IsClassified)).ToList();
+            var males = cursor.Where(entry => entry.Tweet.Gender == Gender.Male).Count();
+            var females = cursor.Where(entry => entry.Tweet.Gender == Gender.Female).Count();
+            var other = cursor.Where(entry => entry.Tweet.Gender == Gender.Other).Count();
+            return (males, females, other);
+        }
+
         public async Task Remove(string id)
         {
             var objId = ObjectId.Parse(id);
